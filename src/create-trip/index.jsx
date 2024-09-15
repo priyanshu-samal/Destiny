@@ -83,26 +83,40 @@ const CreateTrip = () => {
     }
   };
 
-  const SaveAiTrip = async (TripData) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const docId = Date.now().toString();
+const SaveAiTrip = async (TripData) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const docId = Date.now().toString();
 
-    try {
-      await setDoc(doc(db, "AITrip", docId), {
-        userSelection: formData,
-        tripData: JSON.parse(TripData),
-        userEmail: user?.email,
-        id: docId,
-        timestamp: Date.now(),
-      });
-      setLoading(false);
-      navigate('/view-trip/' + docId);
-    } catch (error) {
-      console.error("Error saving trip:", error);
-      toast("Error saving trip. Please try again.");
-      setLoading(false);
-    }
-  };
+  // Debugging: Log the raw TripData to inspect it
+  console.log("Raw TripData:", TripData);
+
+  try {
+    // Try to parse the TripData and log any parsing errors
+    const parsedTripData = JSON.parse(TripData);
+    
+    // Save the parsed trip data to Firebase
+    await setDoc(doc(db, "AITrip", docId), {
+      userSelection: formData,
+      tripData: parsedTripData,
+      userEmail: user?.email,
+      id: docId,
+      timestamp: Date.now(),
+    });
+    
+    // Navigate to the view-trip page after successful save
+    setLoading(false);
+    navigate('/view-trip/' + docId);
+  } catch (error) {
+    // If there's an error during parsing or saving, handle it here
+    console.error("Error saving trip:", error);
+    
+    // Show a toast to inform the user that an error occurred
+    toast("Error saving trip. Please try again.");
+    
+    // Set loading to false after error
+    setLoading(false);
+  }
+};
 
   const GetUserProfile = (tokenInfo) => {
     axios
